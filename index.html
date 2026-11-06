@@ -182,6 +182,20 @@
   </style>
 </head>
 <body>
+<script>
+(function(){
+  var P='Kaseya@SfDc123!', K='kaseya-dash-auth';
+  if(sessionStorage.getItem(K)!==P){
+    var v=prompt('Enter password to access this dashboard:');
+    if(v!==P){
+      document.documentElement.innerHTML='<html><body style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#f4f6f9"><div style="text-align:center;color:#475569"><div style="font-size:48px;margin-bottom:16px">&#128274;</div><div style="font-size:18px;font-weight:600;color:#0f172a;margin-bottom:8px">Access Denied</div><div style="font-size:13px">Incorrect password. Please contact the dashboard owner.</div></div></body></html>';
+      return;
+    }
+    sessionStorage.setItem(K,P);
+  }
+})();
+</script>
+
 
 <div class="topbar"></div>
 
