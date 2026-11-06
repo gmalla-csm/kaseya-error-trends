@@ -180,7 +180,6 @@
     /* ── footer ── */
     footer{text-align:center;color:var(--tm);font-size:11px;padding:16px 0 24px;border-top:1px solid var(--border);margin-top:8px;}
   </style>
-<script>window.__GAS_DATA__={platformCsv:<?!= JSON.stringify(platformCsv) ?>,apexCsv:<?!= JSON.stringify(apexCsv) ?>};</script>
 </head>
 <body>
 
@@ -741,36 +740,6 @@ function setStatus(state) {
   };
   const [txt,cls]=map[state]||map.demo;
   el.textContent=txt; el.className='data-status '+cls;
-}
-
-
-function ingestServerData(pCsv, aCsv) {
-  try {
-    const pRows = parseCsv(pCsv);
-    PLT_DATES.length = 0;
-    Object.keys(PLT_DATA).forEach(k => PLT_DATA[k].vals = []);
-    const colMap = {
-      tx:'Total_Transactions', cpu:'CPU_Timeout_Errors', gov:'Gov_Limit_Errors',
-      row:'Row_Lock_Errors',   cui:'Concurrent_UI_Errors', apex:'Concurrent_Apex_Errors',
-      co:'Callouts',           fc:'Failed_Callouts',       bulk:'Bulk_API_Failures'
-    };
-    pRows.forEach(r => {
-      PLT_DATES.push(r.Label || r.Date);
-      Object.entries(colMap).forEach(([key, col]) => {
-        if (PLT_DATA[key]) PLT_DATA[key].vals.push(Number(r[col]) || 0);
-      });
-    });
-    const aRows = parseCsv(aCsv);
-    RAW.length = 0;
-    aRows.forEach(r => {
-      if (r.Week && r.Subject && r.Error_Thrown)
-        RAW.push([r.Week, r.Subject, r.Error_Thrown, Number(r.Errors)||0, Number(r.Transactions)||0]);
-    });
-    return PLT_DATES.length > 0;
-  } catch(e) {
-    console.warn('Server data ingest failed:', e.message);
-    return false;
-  }
 }
 
 async function loadFromSheets() {
@@ -1465,15 +1434,9 @@ function populateFilters() {
    INIT
 ═══════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded',async ()=>{
-  let liveLoaded = false;
-  if(window.__GAS_DATA__ && window.__GAS_DATA__.platformCsv) {
-    liveLoaded = ingestServerData(window.__GAS_DATA__.platformCsv, window.__GAS_DATA__.apexCsv);
-    if(liveLoaded) setStatus('live');
-  }
-  if(!liveLoaded) {
-    liveLoaded = await loadFromSheets();
-    if(!liveLoaded) setStatus('demo');
-  }
+  // Try live sheet first; fall back to embedded static data
+  const liveLoaded = await loadFromSheets();
+  if(!liveLoaded) setStatus('demo');
   rebuildAggregations();
 
   /* Tab navigation */
