@@ -408,17 +408,17 @@
 /* ═══════════════════════════════════════════════════════════
    DATA — Platform Metrics (bi-weekly snapshots)
 ═══════════════════════════════════════════════════════════ */
-const PLT_DATES  = ['Aug 31','Sep 15','Sep 28','Oct 12','Oct 26','Nov 2','Nov 3','Nov 4','Nov 5','Nov 6'];
+const PLT_DATES  = ['Aug 31','Sep 15','Sep 28','Oct 12','Oct 26','Nov 2','Nov 3','Nov 4','Nov 5','Nov 6','Nov 7','Nov 8','Nov 9','Nov 10'];
 const PLT_DATA   = {
-  tx:   {label:'Total Transactions',  unit:'M',    vals:[119,119,137,132,125,82,11,10.7,11.8,11.2], icon:'📊', color:'#0176d3', theme:'blue',  dir:'neutral'},
-  cpu:  {label:'CPU Timeout Errors',  unit:'',     vals:[196,52,48,29,155,138,1,1,0,0],        icon:'⚡', color:'#ba0517', theme:'red',   dir:'lower-better'},
-  gov:  {label:'Gov Limit Errors',    unit:'k',    vals:[9750,15500,12700,10200,8460,5469,628,618,625,474], icon:'🚧', color:'#dd5a0b', theme:'orange', div:1000, dir:'lower-better'},
-  row:  {label:'Row Lock Errors',     unit:'k',    vals:[37300,37600,18700,28300,21100,23695,4600,1390,1170,1305], icon:'🔒', color:'#a8620b', theme:'yellow', div:1000, dir:'lower-better'},
-  cui:  {label:'Concurrent UI Errors',unit:'',     vals:[334,1340,438,63,943,450,0,0,0,0],    icon:'🖥', color:'#5a3e95', theme:'purple', dir:'lower-better'},
-  apex: {label:'Concurrent Apex Err', unit:'',     vals:[0,0,0,0,0,0,0,0,0,0],               icon:'✅', color:'#2e844a', theme:'green', dir:'lower-better'},
-  co:   {label:'Callouts',            unit:'k',    vals:[507,507,577,592,538,247,37.5,41.1,48.2,45.5], icon:'📡', color:'#0176d3', theme:'blue',  div:1, dir:'neutral'},
-  fc:   {label:'Failed Callouts',     unit:'k',    vals:[3990,10600,2810,8720,2960,4560,3830,3660,4810,4037], icon:'❌', color:'#ba0517', theme:'red', div:1000, dir:'lower-better'},
-  bulk: {label:'Bulk API Failures',   unit:'',     vals:[39,53,37,47,37,2,0,0,2,2],           icon:'🗂', color:'#0176d3', theme:'blue',  dir:'lower-better'},
+  tx:   {label:'Total Transactions',  unit:'M',    vals:[119,119,137,132,125,82,11,10.7,11.8,11.2,6.7,4.2,8.7,11.4], icon:'📊', color:'#0176d3', theme:'blue',  dir:'neutral'},
+  cpu:  {label:'CPU Timeout Errors',  unit:'',     vals:[196,52,48,29,155,138,1,1,0,0,9,0,5,0],        icon:'⚡', color:'#ba0517', theme:'red',   dir:'lower-better'},
+  gov:  {label:'Gov Limit Errors',    unit:'k',    vals:[9750,15500,12700,10200,8460,5469,628,618,625,474,631,479,626,569], icon:'🚧', color:'#dd5a0b', theme:'orange', div:1000, dir:'lower-better'},
+  row:  {label:'Row Lock Errors',     unit:'k',    vals:[37300,37600,18700,28300,21100,23695,4600,1390,1170,1305,975,645,6899,1070], icon:'🔒', color:'#a8620b', theme:'yellow', div:1000, dir:'lower-better'},
+  cui:  {label:'Concurrent UI Errors',unit:'',     vals:[334,1340,438,63,943,450,0,0,0,0,0,0,0,0],    icon:'🖥', color:'#5a3e95', theme:'purple', dir:'lower-better'},
+  apex: {label:'Concurrent Apex Err', unit:'',     vals:[0,0,0,0,0,0,0,0,0,0,0,0,0,0],               icon:'✅', color:'#2e844a', theme:'green', dir:'lower-better'},
+  co:   {label:'Callouts',            unit:'k',    vals:[507,507,577,592,538,247,37.5,41100,43500,41800,2580,2050,39000,27208], icon:'📡', color:'#0176d3', theme:'blue',  div:1, dir:'neutral'},
+  fc:   {label:'Failed Callouts',     unit:'k',    vals:[3990,10600,2810,8720,2960,4560,3830,3660,4250,3390,36,174,4290,2585], icon:'❌', color:'#ba0517', theme:'red', div:1000, dir:'lower-better'},
+  bulk: {label:'Bulk API Failures',   unit:'',     vals:[39,53,37,47,37,2,0,0,2,2,0,0,0,0],           icon:'🗂', color:'#0176d3', theme:'blue',  dir:'lower-better'},
 };
 
 /* ═══════════════════════════════════════════════════════════
@@ -650,13 +650,14 @@ function normSubj(s) {
 }
 
 function isoStart(w) {
-  const [d,m,y] = w.split(" - ")[0].trim().split("/");
-  return `${y}-${m.padStart(2,"0")}-${d.padStart(2,"0")}`;
+  const s=w.split(" - ")[0].trim(), p=s.split("/");
+  // weekly keys: DD/MM/YYYY - DD/MM/YYYY; daily keys: MM/DD/YYYY
+  return w.includes(" - ")
+    ? `${p[2]}-${p[1].padStart(2,"0")}-${p[0].padStart(2,"0")}`
+    : `${p[2]}-${p[0].padStart(2,"0")}-${p[1].padStart(2,"0")}`;
 }
 function weekLbl(w) {
-  const [d,m,y] = w.split(" - ")[0].trim().split("/");
-  return new Date(`${y}-${m.padStart(2,"0")}-${d.padStart(2,"0")}T12:00:00`)
-    .toLocaleDateString("en-US",{month:"short",day:"numeric"});
+  return new Date(isoStart(w)+'T12:00:00').toLocaleDateString("en-US",{month:"short",day:"numeric"});
 }
 function fmt(n) { return n >= 1000 ? (n/1000).toFixed(1)+'k' : String(n); }
 function fmtFull(n) { return n.toLocaleString(); }
