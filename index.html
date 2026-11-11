@@ -408,17 +408,17 @@
 /* ═══════════════════════════════════════════════════════════
    DATA — Platform Metrics (bi-weekly snapshots)
 ═══════════════════════════════════════════════════════════ */
-const PLT_DATES  = ['Aug 31','Sep 15','Sep 28','Oct 12','Oct 26','Nov 2','Nov 3','Nov 4','Nov 5','Nov 6','Nov 7','Nov 8','Nov 9','Nov 10'];
+const PLT_DATES  = ['Aug 31','Sep 15','Sep 28','Oct 12','Oct 26','Nov 2','Nov 3','Nov 4','Nov 5','Nov 6','Nov 7','Nov 8','Nov 9','Nov 10','Nov 11'];
 const PLT_DATA   = {
-  tx:   {label:'Total Transactions',  unit:'M',    vals:[119,119,137,132,125,82,11,10.7,11.8,11.2,6.7,4.2,8.7,11.4], icon:'📊', color:'#0176d3', theme:'blue',  dir:'neutral'},
-  cpu:  {label:'CPU Timeout Errors',  unit:'',     vals:[196,52,48,29,155,138,1,1,0,0,9,0,5,0],        icon:'⚡', color:'#ba0517', theme:'red',   dir:'lower-better'},
-  gov:  {label:'Gov Limit Errors',    unit:'k',    vals:[9750,15500,12700,10200,8460,5469,628,618,625,474,631,479,626,569], icon:'🚧', color:'#dd5a0b', theme:'orange', div:1000, dir:'lower-better'},
-  row:  {label:'Row Lock Errors',     unit:'k',    vals:[37300,37600,18700,28300,21100,23695,4600,1390,1170,1305,975,645,6899,1070], icon:'🔒', color:'#a8620b', theme:'yellow', div:1000, dir:'lower-better'},
-  cui:  {label:'Concurrent UI Errors',unit:'',     vals:[334,1340,438,63,943,450,0,0,0,0,0,0,0,0],    icon:'🖥', color:'#5a3e95', theme:'purple', dir:'lower-better'},
-  apex: {label:'Concurrent Apex Err', unit:'',     vals:[0,0,0,0,0,0,0,0,0,0,0,0,0,0],               icon:'✅', color:'#2e844a', theme:'green', dir:'lower-better'},
-  co:   {label:'Callouts',            unit:'k',    vals:[507,507,577,592,538,247,37.5,41100,43500,41800,2580,2050,39000,27208], icon:'📡', color:'#0176d3', theme:'blue',  div:1, dir:'neutral'},
-  fc:   {label:'Failed Callouts',     unit:'k',    vals:[3990,10600,2810,8720,2960,4560,3830,3660,4250,3390,36,174,4290,2585], icon:'❌', color:'#ba0517', theme:'red', div:1000, dir:'lower-better'},
-  bulk: {label:'Bulk API Failures',   unit:'',     vals:[39,53,37,47,37,2,0,0,2,2,0,0,0,0],           icon:'🗂', color:'#0176d3', theme:'blue',  dir:'lower-better'},
+  tx:   {label:'Total Transactions',  unit:'M',    vals:[119,119,137,132,125,82,11,10.7,11.8,11.2,6.7,4.2,8.7,12.4,3.4], icon:'📊', color:'#0176d3', theme:'blue',  dir:'neutral'},
+  cpu:  {label:'CPU Timeout Errors',  unit:'',     vals:[196,52,48,29,155,138,1,1,0,0,9,0,5,0,1],        icon:'⚡', color:'#ba0517', theme:'red',   dir:'lower-better'},
+  gov:  {label:'Gov Limit Errors',    unit:'k',    vals:[9750,15500,12700,10200,8460,5469,628,618,625,474,631,479,626,658,116], icon:'🚧', color:'#dd5a0b', theme:'orange', div:1000, dir:'lower-better'},
+  row:  {label:'Row Lock Errors',     unit:'k',    vals:[37300,37600,18700,28300,21100,23695,4600,1390,1170,1305,975,645,6899,1070,367], icon:'🔒', color:'#a8620b', theme:'yellow', div:1000, dir:'lower-better'},
+  cui:  {label:'Concurrent UI Errors',unit:'',     vals:[334,1340,438,63,943,450,0,0,0,0,0,0,0,0,0],    icon:'🖥', color:'#5a3e95', theme:'purple', dir:'lower-better'},
+  apex: {label:'Concurrent Apex Err', unit:'',     vals:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],               icon:'✅', color:'#2e844a', theme:'green', dir:'lower-better'},
+  co:   {label:'Callouts',            unit:'k',    vals:[507,507,577,592,538,247,37.5,41100,43500,41800,2580,2050,39425,43962,11006], icon:'📡', color:'#0176d3', theme:'blue',  div:1, dir:'neutral'},
+  fc:   {label:'Failed Callouts',     unit:'k',    vals:[3990,10600,2810,8720,2960,4560,3830,3660,4250,3390,36,174,4223,3942,1256], icon:'❌', color:'#ba0517', theme:'red', div:1000, dir:'lower-better'},
+  bulk: {label:'Bulk API Failures',   unit:'',     vals:[39,53,37,47,37,2,0,0,2,2,0,0,0,0,0],           icon:'🗂', color:'#0176d3', theme:'blue',  dir:'lower-better'},
 };
 
 /* ═══════════════════════════════════════════════════════════
@@ -592,15 +592,41 @@ const RAW=[
   ["05/11/2026 - 06/11/2026","/aura ServerServiceImpl::action aura://ApexActionController/ACTION$execute(Datoo_SubscriptionTransferController.searchAccount)","System.LimitException: Too many DML statements: 1",1,1],
   ["05/11/2026 - 06/11/2026","/mockRequest/ApexFuture/","Too many SOQL queries: 201",1,1],
   ["05/11/2026 - 06/11/2026","/services/apexrest/v1/AIM_UNF_UpdatedContractTerm","System.LimitException: Too many query rows: 50001",1,1],
-  ["06/11/2026 - Now","/services/Soap/u/39.0/","Too many SOQL queries: 101",190,190],
-  ["06/11/2026 - Now","/services/apexrest/API/billing","Too many SOQL queries: 101",167,167],
-  ["06/11/2026 - Now","/apexremote","Too many SOQL queries: 101",62,62],
-  ["06/11/2026 - Now","/mockRequest/BatchApexJobItem/","SP_Exception: You are trying to void envelopes from too many records in 1 transaction",30,17],
-  ["06/11/2026 - Now","/mockRequest/ScheduledApex/","System.LimitException: Too many query rows: 50001",19,19],
-  ["06/11/2026 - Now","/aura ServerServiceImpl::action aura://ApexActionController/ACTION$execute(Datoo_SubscriptionTransferController.searchAccount)","System.LimitException: Too many DML statements: 1",2,2],
-  ["06/11/2026 - Now","/services/apexrest/SBQQ/ServiceRouter","Too many SOQL queries: 101",2,2],
-  ["06/11/2026 - Now","/apex/RampQuote_KO2","Too many SOQL queries: 101",1,1],
-  ["06/11/2026 - Now","/mockRequest/ApexFuture/","Too many SOQL queries: 201",1,1]
+  ["11/07/2026","/apexremote","Too many SOQL queries: 101",36,36],
+  ["11/07/2026","/mockRequest/ScheduledApex/","System.LimitException: Too many query rows: 50001",22,22],
+  ["11/07/2026","/services/Soap/u/68.0/","CPU_ENFORCED:Apex execution exceeded xxxxx ms of CPU time so far, excluding xxxxx ms (limit is 15000 ms)",9,9],
+  ["11/08/2026","/services/Soap/u/39.0/","Too many SOQL queries: 101",231,231],
+  ["11/08/2026","/services/apexrest/API/billing","Too many SOQL queries: 101",223,223],
+  ["11/08/2026","/mockRequest/ScheduledApex/","System.LimitException: Too many query rows: 50001",24,24],
+  ["11/08/2026","/services/apexrest/v1/AIM_UNF_UpdatedContractTerm","System.LimitException: Too many query rows: 50001",1,1],
+  ["11/09/2026","/services/apexrest/API/billing","Too many SOQL queries: 101",317,317],
+  ["11/09/2026","/services/Soap/u/39.0/","Too many SOQL queries: 101",221,221],
+  ["11/09/2026","/apexremote","Too many SOQL queries: 101",33,33],
+  ["11/09/2026","/mockRequest/ScheduledApex/","System.LimitException: Too many query rows: 50001",24,24],
+  ["11/09/2026","/mockRequest/BatchApexJobItem/","SP_Exception: You are trying to void envelopes from too many records in 1 transaction",18,9],
+  ["11/09/2026","/apex/ValidateApproval","Too many SOQL queries: 101",2,2],
+  ["11/09/2026","/aura ServerServiceImpl::action aura://ApexActionController/ACTION$execute(Datoo_SubscriptionTransferController.searchAccount)","System.LimitException: Too many DML statements: 1",2,2],
+  ["11/09/2026","/apex/Resubmit_from_CTR","Too many SOQL queries: 101",1,1],
+  ["11/09/2026","/apex/sbaa__PreviewApprovals","CPU_ENFORCED:Apex execution exceeded xxxxx ms of CPU time so far, excluding xxxxx ms (limit is 15000 ms)",1,1],
+  ["11/09/2026","/apex/sbaa__PreviewApprovals","System.LimitException: Apex CPU time limit exceeded",1,1],
+  ["11/09/2026","/mockRequest/ScheduledApex/","System.LimitException: Can only throw this exception type from VisualForce or Aura context",1,1],
+  ["11/09/2026","/mockRequest/mailcatcher/00000005-0000000005","CPU_ENFORCED:Apex execution exceeded xxxxx ms of CPU time so far, excluding xxxxx ms (limit is 15000 ms)",1,0],
+  ["11/09/2026","/mockRequest/mailcatcher/00000011-0000000009","CPU_ENFORCED:Apex execution exceeded xxxxx ms of CPU time so far, excluding xxxxx ms (limit is 15000 ms)",1,0],
+  ["11/09/2026","/services/apexrest/v1/AIM_UNF_UpdatedContractTerm","System.LimitException: Too many query rows: 50001",1,1],
+  ["11/09/2026","/services/apexrest/v1/ada-billing/createCase","CPU_ENFORCED:Apex execution exceeded xxxxx ms of CPU time so far, excluding xxxxx ms (limit is 15000 ms)",1,1],
+  ["11/09/2026","/services/data/v68.0/support/functions/172Rp0000016CUN","System.LimitException: Can only throw this exception type from VisualForce or Aura context",1,1],
+  ["11/10/2026","/services/apexrest/API/billing","Too many SOQL queries: 101",302,302],
+  ["11/10/2026","/services/Soap/u/39.0/","Too many SOQL queries: 101",203,203],
+  ["11/10/2026","/apexremote","Too many SOQL queries: 101",94,94],
+  ["11/10/2026","/mockRequest/BatchApexJobItem/","SP_Exception: You are trying to void envelopes from too many records in 1 transaction",34,17],
+  ["11/10/2026","/mockRequest/ScheduledApex/","System.LimitException: Too many query rows: 50001",23,23],
+  ["11/10/2026","/apex/RampQuote_KO2","Too many SOQL queries: 101",1,1],
+  ["11/10/2026","/mockRequest/ApexFuture/","Too many SOQL queries: 201",1,1],
+  ["11/11/2026","/services/Soap/u/39.0/","Too many SOQL queries: 101",86,86],
+  ["11/11/2026","/apexremote","Too many SOQL queries: 101",14,14],
+  ["11/11/2026","/mockRequest/ScheduledApex/","System.LimitException: Too many query rows: 50001",9,9],
+  ["11/11/2026","/mockRequest/BatchApexJobItem/","SP_Exception: You are trying to void envelopes from too many records in 1 transaction",6,3],
+  ["11/11/2026","/services/Soap/u/61.0","CPU_ENFORCED:Apex execution exceeded xxxxx ms of CPU time so far, excluding xxxxx ms (limit is 15000 ms)",1,1]
 ];
 
 /* ═══════════════════════════════════════════════════════════
