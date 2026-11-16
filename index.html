@@ -1296,83 +1296,96 @@ function buildCharts() {
    EXEC SUMMARY — Overview tab (Today vs Yesterday)
 ═══════════════════════════════════════════════════════════ */
 function buildOvExec() {
-  // Platform: "today" = last entry, "yesterday" = second-to-last entry (always dynamic)
-  const todayIdx=PLT_DATES.length-1, yestIdx=PLT_DATES.length-2;
-  const todayLbl=PLT_DATES[todayIdx], yestLbl=PLT_DATES[yestIdx];
+  // today (length-1) = partial/in-progress; comparison = today-1 vs today-2
+  const todayIdx = PLT_DATES.length-1;  // Nov 16 — in progress
+  const compIdx  = PLT_DATES.length-2;  // Nov 15 — complete, primary "current"
+  const prevIdx  = PLT_DATES.length-3;  // Nov 14 — comparison baseline
+  const todayLbl = PLT_DATES[todayIdx];
+  const compLbl  = PLT_DATES[compIdx];
+  const prevLbl  = PLT_DATES[prevIdx];
+
+  function disp(m, idx) {
+    const v = m.vals[idx];
+    return m.div && m.div!==1 ? (v/1000).toFixed(1)+m.unit : fmtFull(v)+(m.unit||'');
+  }
 
   function pltRow(key) {
-    const m=PLT_DATA[key];
-    const t=m.vals[todayIdx], y=m.vals[yestIdx];
-    const pct=((t-y)/y*100);
-    const up=t>y;
-    const bad=(up&&m.dir==='lower-better')||((!up)&&m.dir==='higher-better');
-    const good=((!up)&&m.dir==='lower-better')||((up)&&m.dir==='higher-better');
-    const cls=bad?'delta-up-bad':good?'delta-down-good':'delta-neutral';
-    const arrow=up?'↑':'↓';
-    const dispT=m.div&&m.div!==1?(t/1000).toFixed(1)+m.unit:fmtFull(t)+(m.unit||'');
-    const dispY=m.div&&m.div!==1?(y/1000).toFixed(1)+m.unit:fmtFull(y)+(m.unit||'');
+    const m  = PLT_DATA[key];
+    const c  = m.vals[compIdx];
+    const p  = m.vals[prevIdx];
+    const pct = p===0 ? 0 : ((c-p)/p*100);
+    const up  = c > p;
+    const bad  = (up && m.dir==='lower-better') || (!up && m.dir==='higher-better');
+    const good = (!up && m.dir==='lower-better') || (up && m.dir==='higher-better');
+    const cls  = bad ? 'delta-up-bad' : good ? 'delta-down-good' : 'delta-neutral';
+    const arrow = up ? '↑' : '↓';
     return `<tr>
       <td>${m.label}</td>
-      <td style="text-align:right;color:var(--tm)">${dispY}</td>
-      <td style="text-align:right;font-weight:600">${dispT}</td>
+      <td style="text-align:right;color:var(--tm)">${disp(m,prevIdx)}</td>
+      <td style="text-align:right;font-weight:600">${disp(m,compIdx)}</td>
       <td class="${cls}" style="text-align:right">${arrow} ${Math.abs(pct).toFixed(1)}%</td>
+      <td style="text-align:right;color:#6b7280;font-style:italic" title="${todayLbl} — in progress">${disp(m,todayIdx)}</td>
     </tr>`;
   }
 
-  // Apex: today = latestWk (Oct 18-24), yesterday = prior week
-  const wkIdx=WEEKS.length-1, prevWkIdx=WEEKS.length-2;
-  const wkT=wkTot[WEEKS[wkIdx]], wkY=wkTot[WEEKS[prevWkIdx]];
-  const aPct=((wkT.e-wkY.e)/wkY.e*100);
+  // Apex: today-2 vs today-1 comparison; today shown as in-progress
+  const wkIdx     = WEEKS.length-1;  // today (partial)
+  const compWkIdx = WEEKS.length-2;  // today-1 (complete)
+  const prevWkIdx = WEEKS.length-3;  // today-2 (baseline)
+  const wkT  = wkTot[WEEKS[wkIdx]];
+  const wkC  = wkTot[WEEKS[compWkIdx]];
+  const wkPv = wkTot[WEEKS[prevWkIdx]];
+  const aPct = wkPv.e===0 ? 0 : ((wkC.e-wkPv.e)/wkPv.e*100);
   const apexRows=`
-    <tr><td>Total Errors</td><td style="text-align:right;color:var(--tm)">${fmtFull(wkY.e)}</td><td style="text-align:right;font-weight:600">${fmtFull(wkT.e)}</td><td class="${aPct<0?'delta-down-good':'delta-up-bad'}" style="text-align:right">${aPct<0?'↓':'↑'} ${Math.abs(aPct).toFixed(1)}%</td></tr>
-    <tr><td>Transactions Affected</td><td style="text-align:right;color:var(--tm)">${fmtFull(wkY.tx)}</td><td style="text-align:right;font-weight:600">${fmtFull(wkT.tx)}</td><td class="delta-neutral" style="text-align:right">—</td></tr>
-    <tr><td>Err / Tx Ratio</td><td style="text-align:right;color:var(--tm)">${(wkY.e/wkY.tx).toFixed(2)}×</td><td style="text-align:right;font-weight:600">${(wkT.e/wkT.tx).toFixed(2)}×</td><td class="delta-neutral" style="text-align:right">—</td></tr>`;
+    <tr><td>Total Errors</td><td style="text-align:right;color:var(--tm)">${fmtFull(wkPv.e)}</td><td style="text-align:right;font-weight:600">${fmtFull(wkC.e)}</td><td class="${aPct<0?'delta-down-good':'delta-up-bad'}" style="text-align:right">${aPct<0?'↓':'↑'} ${Math.abs(aPct).toFixed(1)}%</td><td style="text-align:right;color:#6b7280;font-style:italic" title="${weekLbl(WEEKS[wkIdx])} — in progress">${fmtFull(wkT.e)}</td></tr>
+    <tr><td>Transactions Affected</td><td style="text-align:right;color:var(--tm)">${fmtFull(wkPv.tx)}</td><td style="text-align:right;font-weight:600">${fmtFull(wkC.tx)}</td><td class="delta-neutral" style="text-align:right">—</td><td style="text-align:right;color:#6b7280;font-style:italic">${fmtFull(wkT.tx)}</td></tr>
+    <tr><td>Err / Tx Ratio</td><td style="text-align:right;color:var(--tm)">${(wkPv.e/wkPv.tx).toFixed(2)}×</td><td style="text-align:right;font-weight:600">${(wkC.e/wkC.tx).toFixed(2)}×</td><td class="delta-neutral" style="text-align:right">—</td><td style="text-align:right;color:#6b7280;font-style:italic">${(wkT.e/wkT.tx).toFixed(2)}×</td></tr>`;
 
-  // Signals: biggest movers
+  // Signals: compare complete days (compIdx vs prevIdx)
   const concerns=[
     {key:'cpu',label:'CPU Timeout Errors'},
     {key:'cui',label:'Concurrent UI Errors'}
-  ].filter(x=>{ const m=PLT_DATA[x.key]; return m.vals[todayIdx]>m.vals[yestIdx]; });
+  ].filter(x=>{ const m=PLT_DATA[x.key]; return m.vals[compIdx]>m.vals[prevIdx]; });
   const positives=[
     {key:'fc',label:'Failed Callouts'},
     {key:'row',label:'Row Lock Errors'},
     {key:'gov',label:'Gov Limit Errors'}
-  ].filter(x=>{ const m=PLT_DATA[x.key]; return m.vals[todayIdx]<m.vals[yestIdx]; });
+  ].filter(x=>{ const m=PLT_DATA[x.key]; return m.vals[compIdx]<m.vals[prevIdx]; });
 
   const concernHtml=concerns.map(x=>{
-    const m=PLT_DATA[x.key]; const t=m.vals[todayIdx],y=m.vals[yestIdx];
-    const p=((t-y)/y*100).toFixed(0);
-    return `<div class="signal" style="--sc:#ba0517;--sb:#fef2f2"><div class="signal-head">⚠ ${x.label}</div><div class="signal-body">${fmtFull(y)} → <strong>${fmtFull(t)}</strong> (↑${p}% vs ${yestLbl}). Needs investigation.</div></div>`;
+    const m=PLT_DATA[x.key]; const c=m.vals[compIdx], p=m.vals[prevIdx];
+    const pct=p===0?0:((c-p)/p*100);
+    return `<div class="signal" style="--sc:#ba0517;--sb:#fef2f2"><div class="signal-head">⚠ ${x.label}</div><div class="signal-body">${fmtFull(p)} → <strong>${fmtFull(c)}</strong> (↑${Math.abs(pct).toFixed(0)}% vs ${prevLbl}). Needs investigation.</div></div>`;
   }).join('');
   const positiveHtml=positives.slice(0,2).map(x=>{
-    const m=PLT_DATA[x.key]; const t=m.vals[todayIdx],y=m.vals[yestIdx];
-    const p=((y-t)/y*100).toFixed(0);
-    return `<div class="signal" style="--sc:#2e844a;--sb:#eaf5ea"><div class="signal-head">✅ ${x.label}</div><div class="signal-body">${fmtFull(y)} → <strong>${fmtFull(t)}</strong> (↓${p}% vs ${yestLbl}). Positive movement.</div></div>`;
+    const m=PLT_DATA[x.key]; const c=m.vals[compIdx], p=m.vals[prevIdx];
+    const pct=p===0?0:((p-c)/p*100);
+    return `<div class="signal" style="--sc:#2e844a;--sb:#eaf5ea"><div class="signal-head">✅ ${x.label}</div><div class="signal-body">${fmtFull(p)} → <strong>${fmtFull(c)}</strong> (↓${Math.abs(pct).toFixed(0)}% vs ${prevLbl}). Positive movement.</div></div>`;
   }).join('');
 
   document.getElementById('ov-exec').innerHTML=`
-    <span class="exec-tag">Today vs Yesterday · ${todayLbl} vs ${yestLbl}, 2026</span>
+    <span class="exec-tag">${compLbl} vs ${prevLbl}, 2026 · ${todayLbl} in progress (till now)</span>
     <div class="ov-compare-grid">
       <div class="ov-compare-section">
         <div class="ov-cs-title">Platform Metrics Snapshot</div>
         <table class="compare-table">
-          <thead><tr><th>Metric</th><th style="text-align:right">${yestLbl}</th><th style="text-align:right">${todayLbl} ★</th><th style="text-align:right">Change</th></tr></thead>
+          <thead><tr><th>Metric</th><th style="text-align:right">${prevLbl}</th><th style="text-align:right">${compLbl} ★</th><th style="text-align:right">Change</th><th style="text-align:right;color:#6b7280;font-style:italic">${todayLbl} ⏳</th></tr></thead>
           <tbody>
             ${['tx','cpu','gov','row','cui','co','fc'].map(pltRow).join('')}
           </tbody>
         </table>
       </div>
       <div class="ov-compare-section">
-        <div class="ov-cs-title">Apex Error Logs — ${weekLbl(WEEKS[wkIdx])} vs ${weekLbl(WEEKS[prevWkIdx])}</div>
+        <div class="ov-cs-title">Apex Error Logs — ${weekLbl(WEEKS[compWkIdx])} vs ${weekLbl(WEEKS[prevWkIdx])}</div>
         <table class="compare-table">
-          <thead><tr><th>Metric</th><th style="text-align:right">${weekLbl(WEEKS[prevWkIdx])}</th><th style="text-align:right">${weekLbl(WEEKS[wkIdx])} ★</th><th style="text-align:right">Change</th></tr></thead>
+          <thead><tr><th>Metric</th><th style="text-align:right">${weekLbl(WEEKS[prevWkIdx])}</th><th style="text-align:right">${weekLbl(WEEKS[compWkIdx])} ★</th><th style="text-align:right">Change</th><th style="text-align:right;color:#6b7280;font-style:italic">${weekLbl(WEEKS[wkIdx])} ⏳</th></tr></thead>
           <tbody>${apexRows}</tbody>
         </table>
         <div style="margin-top:12px">
-          <div class="ov-cs-title">Top Error Subjects — ${weekLbl(WEEKS[wkIdx])}</div>
+          <div class="ov-cs-title">Top Error Subjects — ${weekLbl(WEEKS[compWkIdx])}</div>
           <table class="compare-table"><tbody>
-            ${Object.entries(byWkSubj[WEEKS[wkIdx]]).sort((a,b)=>b[1]-a[1]).slice(0,5)
-              .map(([s,e])=>`<tr><td>${s}</td><td style="text-align:right;font-weight:600">${fmtFull(e)}</td><td style="text-align:right;color:var(--tm)">${((e/wkT.e)*100).toFixed(1)}%</td></tr>`).join('')}
+            ${Object.entries(byWkSubj[WEEKS[compWkIdx]]).sort((a,b)=>b[1]-a[1]).slice(0,5)
+              .map(([s,e])=>`<tr><td>${s}</td><td style="text-align:right;font-weight:600">${fmtFull(e)}</td><td style="text-align:right;color:var(--tm)">${((e/wkC.e)*100).toFixed(1)}%</td></tr>`).join('')}
           </tbody></table>
         </div>
       </div>
